@@ -1,0 +1,28 @@
+{
+  "name": "@strauss/frontend",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@strauss/components": "workspace:*",
+    "@strauss/types": "workspace:0.0.0",
+    "@next/font": "13.1.6",
+    "@types/node": "18.14.0",
+    "@types/react": "^18.0.9",
+    "@types/react-dom": "^18.0.4",
+    "eslint": "^8.15.0",
+    "eslint-config-next": "13.1.6",
+    "next": "13.1.6",
+    "react": "18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "4.9.5"
+  },
+  "devDependencies": {
+    "@strauss/tsconfig": "workspace:0.0.0"
+  }
+}
