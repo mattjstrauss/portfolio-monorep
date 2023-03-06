@@ -1,62 +1,35 @@
-import { createAuth } from '@keystone-next/auth';
-import { config, createSchema } from '@keystone-next/keystone/schema';
-import {
-	withItemData,
-	statelessSessions,
-} from '@keystone-next/keystone/session';
+// Welcome to Keystone!
+//
+// This file is what Keystone uses as the entry-point to your headless backend
+//
+// Keystone imports the default export of this file, expecting a Keystone configuration object
+//   you can find out more at https://keystonejs.com/docs/apis/config
 
-import 'dotenv/config';
-import { User } from './schemas/User';
+import { config } from '@keystone-6/core';
 
-const databaseUrl =
-	process.env.DATABASE_URL || 'mongodb://localhost/keystone-portfolio';
+// to keep this file tidy, we define our schema in a different file
+import { Experiences, Users, Skills } from './schemas';
 
-// Used to help authentication the keystone backend
-const sessionConfig = {
-	maxAge: 60 * 60 * 24 * 360, // How long should they stay signed in for?
-	secret: process.env.COOKIE_SECRET,
-};
+// authentication is configured separately here too, but you might move this elsewhere
+// when you write your list-level access control functions, as they typically rely on session data
+import { withAuth, session } from './auth';
 
-const { withAuth } = createAuth({
-	listKey: 'User', // Name of schema associated with authentication
-	identityField: 'email', // Field to identify the identity
-	secretField: 'password', // Field asked for when auth is identified
-	initFirstItem: {
-		// Enables a "first time" ever field to be created before any user exists
-		fields: ['name', 'email', 'password'],
-	},
-	// TODO: Add initial roles here
-});
+const databaseURL =
+	process.env.DATABASE_URL || 'mysql://root:password@localhost:3306/portfolio';
 
-// Keystone configurations
 export default withAuth(
 	config({
-		server: {
-			cors: {
-				origin: [process.env.FRONTEND_URL],
-				credentials: true,
-			},
-		},
 		db: {
-			adapter: 'mongoose',
-			url: databaseUrl,
-			// TODO: Add data seeding
-		},
-		// Keystone refers ta datatypes as "lists"
-		lists: createSchema({
-			// Schemas go here
-			User: User,
-		}),
-		// Do you want people to be able to see the actual keystone CMS UI (BE)?
-		ui: {
-			// Show the keystone UI for people who pass this test
-			isAccessAllowed: ({ session }) => {
-				return !!session?.data;
+			provider: 'mysql',
+			url: databaseURL,
+			onConnect: async (context) => {
+				/* ... */
 			},
+			// Optional advanced configuration
+			enableLogging: true,
+			idField: { kind: 'uuid' },
 		},
-		session: withItemData(statelessSessions(sessionConfig), {
-			// GraphQL query of user session data
-			User: 'id name email',
-		}),
+		lists: { ...Users, ...Experiences, ...Skills },
+		session,
 	}),
 );
