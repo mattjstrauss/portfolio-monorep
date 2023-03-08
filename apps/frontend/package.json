@@ -1,28 +1,35 @@
 {
-  "name": "@strauss/frontend",
-  "version": "0.0.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "@strauss/components": "workspace:*",
-    "@strauss/types": "workspace:0.0.0",
-    "@next/font": "13.1.6",
-    "@types/node": "18.14.0",
-    "@types/react": "^18.0.9",
-    "@types/react-dom": "^18.0.4",
-    "eslint": "^8.15.0",
-    "eslint-config-next": "13.1.6",
-    "next": "13.1.6",
-    "react": "18.2.0",
-    "react-dom": "^18.2.0",
-    "typescript": "4.9.5"
-  },
-  "devDependencies": {
-    "@strauss/tsconfig": "workspace:0.0.0"
-  }
+	"name": "@strauss/frontend",
+	"version": "0.0.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint"
+	},
+	"dependencies": {
+		"@apollo/client": "3.7.10",
+		"@apollo/link-error": "^2.0.0-beta.3",
+		"@apollo/react-ssr": "^4.0.0",
+		"@next/font": "13.1.6",
+		"@strauss/components": "workspace:*",
+		"@strauss/types": "workspace:0.0.0",
+		"@types/node": "18.14.0",
+		"@types/react": "^18.0.9",
+		"@types/react-dom": "^18.0.4",
+		"apollo-upload-client": "^17.0.0",
+		"eslint": "^8.15.0",
+		"eslint-config-next": "13.1.6",
+		"next": "13.1.6",
+		"next-with-apollo": "^5.3.0",
+		"react": "18.2.0",
+		"react-dom": "^18.2.0",
+		"styled-components": "^5.3.8",
+		"typescript": "4.9.5"
+	},
+	"devDependencies": {
+		"@strauss/tsconfig": "workspace:0.0.0",
+		"@types/styled-components": "^5.1.26"
+	}
 }
