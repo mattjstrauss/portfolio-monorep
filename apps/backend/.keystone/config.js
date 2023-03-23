@@ -23,7 +23,8 @@ __export(keystone_exports, {
   default: () => keystone_default
 });
 module.exports = __toCommonJS(keystone_exports);
-var import_core4 = require("@keystone-6/core");
+var import_config = require("dotenv/config");
+var import_core5 = require("@keystone-6/core");
 
 // schemas/Experiences.ts
 var import_core = require("@keystone-6/core");
@@ -39,10 +40,11 @@ var Experiences = {
     access: import_access.allowAll,
     // this is the fields for our Post list
     fields: {
-      title: (0, import_fields.text)({ validation: { isRequired: true } }),
+      companyName: (0, import_fields.text)({ validation: { isRequired: true } }),
+      positionTitle: (0, import_fields.text)({ validation: { isRequired: true } }),
       // the document field can be used for making rich editable content
       //   you can find out more at https://keystonejs.com/docs/guides/document-fields
-      content: (0, import_fields_document.document)({
+      description: (0, import_fields_document.document)({
         formatting: true,
         layouts: [
           [1, 1],
@@ -74,57 +76,116 @@ var Experiences = {
   })
 };
 
-// schemas/Skills.ts
+// schemas/Users.ts
 var import_core2 = require("@keystone-6/core");
 var import_fields2 = require("@keystone-6/core/fields");
 var import_access2 = require("@keystone-6/core/access");
-var Skills = {
-  Skill: (0, import_core2.list)({
+var Users = {
+  User: (0, import_core2.list)({
     // WARNING
     //   for this starter project, anyone can create, query, update and delete anything
     //   if you want to prevent random people on the internet from accessing your data,
     //   you can find out more at https://keystonejs.com/docs/guides/auth-and-access-control
     access: import_access2.allowAll,
-    // setting this to isHidden for the user interface prevents this list being visible in the Admin UI
-    ui: {
-      isHidden: true
-    },
-    // this is the fields for our Tag list
-    fields: {
-      name: (0, import_fields2.text)(),
-      // this can be helpful to find out all the Experiences associated with a Skill
-      experiences: (0, import_fields2.relationship)({ ref: "Experience.skills", many: true })
-    }
-  })
-};
-
-// schemas/Users.ts
-var import_core3 = require("@keystone-6/core");
-var import_fields3 = require("@keystone-6/core/fields");
-var import_access3 = require("@keystone-6/core/access");
-var Users = {
-  User: (0, import_core3.list)({
-    // WARNING
-    //   for this starter project, anyone can create, query, update and delete anything
-    //   if you want to prevent random people on the internet from accessing your data,
-    //   you can find out more at https://keystonejs.com/docs/guides/auth-and-access-control
-    access: import_access3.allowAll,
     // this is the fields for our User list
     fields: {
       // by adding isRequired, we enforce that every User should have a name
       //   if no name is provided, an error will be displayed
-      name: (0, import_fields3.text)({ validation: { isRequired: true } }),
-      email: (0, import_fields3.text)({
+      name: (0, import_fields2.text)({ validation: { isRequired: true } }),
+      email: (0, import_fields2.text)({
         validation: { isRequired: true },
         // by adding isIndexed: 'unique', we're saying that no user can have the same
         // email as another user - this may or may not be a good idea for your project
         isIndexed: "unique"
       }),
-      password: (0, import_fields3.password)({ validation: { isRequired: true } }),
-      createdAt: (0, import_fields3.timestamp)({
+      password: (0, import_fields2.password)({ validation: { isRequired: true } }),
+      createdAt: (0, import_fields2.timestamp)({
         // this sets the timestamp to Date.now() when the user is first created
         defaultValue: { kind: "now" }
       })
+    }
+  })
+};
+
+// schemas/Skills.ts
+var import_core3 = require("@keystone-6/core");
+var import_access3 = require("@keystone-6/core/access");
+var import_fields3 = require("@keystone-6/core/fields");
+var import_fields_document2 = require("@keystone-6/fields-document");
+var Skills = {
+  Skill: (0, import_core3.list)({
+    // WARNING
+    //   for this starter project, anyone can create, query, update and delete anything
+    //   if you want to prevent random people on the internet from accessing your data,
+    //   you can find out more at https://keystonejs.com/docs/guides/auth-and-access-control
+    access: import_access3.allowAll,
+    // setting this to isHidden for the user interface prevents this list being visible in the Admin UI
+    // ui: {
+    // 	isHidden: true,
+    // },
+    // this is the fields for our Tag list
+    fields: {
+      name: (0, import_fields3.text)({ validation: { isRequired: true } }),
+      // the document field can be used for making rich editable content
+      //   you can find out more at https://keystonejs.com/docs/guides/document-fields
+      description: (0, import_fields_document2.document)({
+        formatting: true,
+        layouts: [
+          [1, 1],
+          [1, 1, 1],
+          [2, 1],
+          [1, 2],
+          [1, 2, 1]
+        ],
+        links: true,
+        dividers: true
+      }),
+      logo: (0, import_fields3.relationship)({
+        ref: "SkillLogo.skill",
+        ui: {
+          displayMode: "cards",
+          cardFields: ["image", "altText"],
+          inlineCreate: { fields: ["image", "altText"] },
+          inlineEdit: { fields: ["image", "altText"] }
+        }
+      }),
+      // this can be helpful to find out all the Experiences associated with a Skill
+      experiences: (0, import_fields3.relationship)({ ref: "Experience.skills", many: true })
+    }
+  })
+};
+
+// schemas/SkillLogos.ts
+var import_cloudinary = require("@keystone-6/cloudinary");
+var import_core4 = require("@keystone-6/core");
+var import_fields4 = require("@keystone-6/core/fields");
+var import_access4 = require("@keystone-6/core/access");
+var cloudinary = {
+  cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+  apiKey: process.env.CLOUDINARY_API_KEY,
+  apiSecret: process.env.CLOUDINARY_API_SECRET,
+  folder: "matthewjstrauss"
+};
+var SkillLogos = {
+  SkillLogo: (0, import_core4.list)({
+    // WARNING
+    //   for this starter project, anyone can create, query, update and delete anything
+    //   if you want to prevent random people on the internet from accessing your data,
+    //   you can find out more at https://keystonejs.com/docs/guides/auth-and-access-control
+    access: import_access4.allowAll,
+    fields: {
+      image: (0, import_cloudinary.cloudinaryImage)({
+        // @ts-ignore
+        cloudinary,
+        label: "Source"
+      }),
+      altText: (0, import_fields4.text)(),
+      skill: (0, import_fields4.relationship)({ ref: "Skill.logo" })
+    },
+    ui: {
+      listView: {
+        initialColumns: ["image", "altText", "skill"]
+      }
     }
   })
 };
@@ -165,7 +226,13 @@ var session = (0, import_session.statelessSessions)({
 // keystone.ts
 var databaseURL = process.env.DATABASE_URL || "mysql://root:password@localhost:3306/portfolio";
 var keystone_default = withAuth(
-  (0, import_core4.config)({
+  (0, import_core5.config)({
+    server: {
+      cors: {
+        origin: [process.env.FRONTEND_URL || "http://localhost:3001"],
+        credentials: true
+      }
+    },
     db: {
       provider: "mysql",
       url: databaseURL,
@@ -175,7 +242,7 @@ var keystone_default = withAuth(
       enableLogging: true,
       idField: { kind: "uuid" }
     },
-    lists: { ...Users, ...Experiences, ...Skills },
+    lists: { ...Users, ...Experiences, ...Skills, ...SkillLogos },
     session
   })
 );

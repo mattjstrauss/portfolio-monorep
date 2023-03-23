@@ -1,4 +1,3 @@
-import '@/styles/globals.css';
 import type { AppProps, AppInitialProps } from 'next/app';
 import {
 	ApolloProvider,

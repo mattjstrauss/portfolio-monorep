@@ -47,13 +47,12 @@ function createClient({ headers, initialState }: IInitializeApollo) {
 			}),
 			// this uses apollo-link-http under the hood, so all the options here come from that package
 			createUploadLink({
-				uri: 'http://localhost:3002/api/graphql',
+				uri: process.env.NODE_ENV === 'development' ? endpoint : prodEndpoint,
 				// Make sure that CORS and cookies work
 				fetchOptions: {
-					// mode: 'cors',
+					mode: 'cors',
 					credentials: 'include',
 				},
-				credentials: 'include',
 				fetch: enhancedFetch,
 			}),
 		]),

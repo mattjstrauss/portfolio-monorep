@@ -113,13 +113,14 @@ input UserCreateInput {
 
 type Experience {
   id: ID!
-  title: String
-  content: Experience_content_Document
+  companyName: String
+  positionTitle: String
+  description: Experience_description_Document
   skills(where: SkillWhereInput! = {}, orderBy: [SkillOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: SkillWhereUniqueInput): [Skill!]
   skillsCount(where: SkillWhereInput! = {}): Int
 }
 
-type Experience_content_Document {
+type Experience_description_Document {
   document(hydrateRelationships: Boolean! = false): JSON!
 }
 
@@ -132,7 +133,8 @@ input ExperienceWhereInput {
   OR: [ExperienceWhereInput!]
   NOT: [ExperienceWhereInput!]
   id: IDFilter
-  title: StringFilter
+  companyName: StringFilter
+  positionTitle: StringFilter
   skills: SkillManyRelationFilter
 }
 
@@ -144,12 +146,14 @@ input SkillManyRelationFilter {
 
 input ExperienceOrderByInput {
   id: OrderDirection
-  title: OrderDirection
+  companyName: OrderDirection
+  positionTitle: OrderDirection
 }
 
 input ExperienceUpdateInput {
-  title: String
-  content: JSON
+  companyName: String
+  positionTitle: String
+  description: JSON
   skills: SkillRelateToManyForUpdateInput
 }
 
@@ -166,8 +170,9 @@ input ExperienceUpdateArgs {
 }
 
 input ExperienceCreateInput {
-  title: String
-  content: JSON
+  companyName: String
+  positionTitle: String
+  description: JSON
   skills: SkillRelateToManyForCreateInput
 }
 
@@ -179,8 +184,14 @@ input SkillRelateToManyForCreateInput {
 type Skill {
   id: ID!
   name: String
+  description: Skill_description_Document
+  logo: SkillLogo
   experiences(where: ExperienceWhereInput! = {}, orderBy: [ExperienceOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ExperienceWhereUniqueInput): [Experience!]
   experiencesCount(where: ExperienceWhereInput! = {}): Int
+}
+
+type Skill_description_Document {
+  document(hydrateRelationships: Boolean! = false): JSON!
 }
 
 input SkillWhereUniqueInput {
@@ -193,6 +204,7 @@ input SkillWhereInput {
   NOT: [SkillWhereInput!]
   id: IDFilter
   name: StringFilter
+  logo: SkillLogoWhereInput
   experiences: ExperienceManyRelationFilter
 }
 
@@ -209,7 +221,15 @@ input SkillOrderByInput {
 
 input SkillUpdateInput {
   name: String
+  description: JSON
+  logo: SkillLogoRelateToOneForUpdateInput
   experiences: ExperienceRelateToManyForUpdateInput
+}
+
+input SkillLogoRelateToOneForUpdateInput {
+  create: SkillLogoCreateInput
+  connect: SkillLogoWhereUniqueInput
+  disconnect: Boolean
 }
 
 input ExperienceRelateToManyForUpdateInput {
@@ -226,12 +246,123 @@ input SkillUpdateArgs {
 
 input SkillCreateInput {
   name: String
+  description: JSON
+  logo: SkillLogoRelateToOneForCreateInput
   experiences: ExperienceRelateToManyForCreateInput
+}
+
+input SkillLogoRelateToOneForCreateInput {
+  create: SkillLogoCreateInput
+  connect: SkillLogoWhereUniqueInput
 }
 
 input ExperienceRelateToManyForCreateInput {
   create: [ExperienceCreateInput!]
   connect: [ExperienceWhereUniqueInput!]
+}
+
+type SkillLogo {
+  id: ID!
+  image: CloudinaryImage_File
+  altText: String
+  skill: Skill
+}
+
+type CloudinaryImage_File {
+  id: ID
+  filename: String
+  originalFilename: String
+  mimetype: String
+  encoding: String
+  publicUrl: String
+  publicUrlTransformed(transformation: CloudinaryImageFormat): String
+}
+
+"""
+Mirrors the formatting options [Cloudinary provides](https://cloudinary.com/documentation/image_transformation_reference).
+All options are strings as they ultimately end up in a URL.
+"""
+input CloudinaryImageFormat {
+  """ Rewrites the filename to be this pretty string. Do not include `/` or `.`
+  """
+  prettyName: String
+  width: String
+  height: String
+  crop: String
+  aspect_ratio: String
+  gravity: String
+  zoom: String
+  x: String
+  y: String
+  format: String
+  fetch_format: String
+  quality: String
+  radius: String
+  angle: String
+  effect: String
+  opacity: String
+  border: String
+  background: String
+  overlay: String
+  underlay: String
+  default_image: String
+  delay: String
+  color: String
+  color_space: String
+  dpr: String
+  page: String
+  density: String
+  flags: String
+  transformation: String
+}
+
+input SkillLogoWhereUniqueInput {
+  id: ID
+}
+
+input SkillLogoWhereInput {
+  AND: [SkillLogoWhereInput!]
+  OR: [SkillLogoWhereInput!]
+  NOT: [SkillLogoWhereInput!]
+  id: IDFilter
+  altText: StringFilter
+  skill: SkillWhereInput
+}
+
+input SkillLogoOrderByInput {
+  id: OrderDirection
+  altText: OrderDirection
+}
+
+input SkillLogoUpdateInput {
+  image: Upload
+  altText: String
+  skill: SkillRelateToOneForUpdateInput
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+input SkillRelateToOneForUpdateInput {
+  create: SkillCreateInput
+  connect: SkillWhereUniqueInput
+  disconnect: Boolean
+}
+
+input SkillLogoUpdateArgs {
+  where: SkillLogoWhereUniqueInput!
+  data: SkillLogoUpdateInput!
+}
+
+input SkillLogoCreateInput {
+  image: Upload
+  altText: String
+  skill: SkillRelateToOneForCreateInput
+}
+
+input SkillRelateToOneForCreateInput {
+  create: SkillCreateInput
+  connect: SkillWhereUniqueInput
 }
 
 """
@@ -258,6 +389,12 @@ type Mutation {
   updateSkills(data: [SkillUpdateArgs!]!): [Skill]
   deleteSkill(where: SkillWhereUniqueInput!): Skill
   deleteSkills(where: [SkillWhereUniqueInput!]!): [Skill]
+  createSkillLogo(data: SkillLogoCreateInput!): SkillLogo
+  createSkillLogos(data: [SkillLogoCreateInput!]!): [SkillLogo]
+  updateSkillLogo(where: SkillLogoWhereUniqueInput!, data: SkillLogoUpdateInput!): SkillLogo
+  updateSkillLogos(data: [SkillLogoUpdateArgs!]!): [SkillLogo]
+  deleteSkillLogo(where: SkillLogoWhereUniqueInput!): SkillLogo
+  deleteSkillLogos(where: [SkillLogoWhereUniqueInput!]!): [SkillLogo]
   endSession: Boolean!
   authenticateUserWithPassword(email: String!, password: String!): UserAuthenticationWithPasswordResult
   createInitialUser(data: CreateInitialUserInput!): UserAuthenticationWithPasswordSuccess!
@@ -290,6 +427,9 @@ type Query {
   skills(where: SkillWhereInput! = {}, orderBy: [SkillOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: SkillWhereUniqueInput): [Skill!]
   skill(where: SkillWhereUniqueInput!): Skill
   skillsCount(where: SkillWhereInput! = {}): Int
+  skillLogos(where: SkillLogoWhereInput! = {}, orderBy: [SkillLogoOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: SkillLogoWhereUniqueInput): [SkillLogo!]
+  skillLogo(where: SkillLogoWhereUniqueInput!): SkillLogo
+  skillLogosCount(where: SkillLogoWhereInput! = {}): Int
   keystone: KeystoneMeta!
   authenticatedItem: AuthenticatedItem
 }

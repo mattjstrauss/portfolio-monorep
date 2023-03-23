@@ -18,5 +18,14 @@
 			"cache": false
 		}
 	},
-	"globalEnv": ["DATABASE_URL", "SESSION_SECRET", "NODE_ENV"]
+	"globalEnv": [
+		"DATABASE_URL",
+		"FRONTEND_URL",
+		"SESSION_SECRET",
+		"NODE_ENV",
+		"CLOUDINARY_CLOUD_NAME",
+		"CLOUDINARY_API_KEY",
+		"CLOUDINARY_API_SECRET",
+		"CLOUDINARY_API_FOLDER"
+	]
 }

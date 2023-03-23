@@ -4,7 +4,7 @@ export default function ExperiencesPage() {
 	return (
 		<>
 			<p>Experiences Page</p>
-      <Experiences />
+			<Experiences />
 		</>
 	);
 }

@@ -20,14 +20,25 @@ model User {
 }
 
 model Experience {
-  id      String  @id @default(uuid())
-  title   String  @default("")
-  content Json    @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
-  skills  Skill[] @relation("Experience_skills")
+  id            String  @id @default(uuid())
+  companyName   String  @default("")
+  positionTitle String  @default("")
+  description   Json    @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
+  skills        Skill[] @relation("Experience_skills")
 }
 
 model Skill {
   id          String       @id @default(uuid())
   name        String       @default("")
+  description Json         @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
+  logo        SkillLogo?   @relation("Skill_logo", fields: [logoId], references: [id])
+  logoId      String?      @unique @map("logo")
   experiences Experience[] @relation("Experience_skills")
+}
+
+model SkillLogo {
+  id      String @id @default(uuid())
+  image   Json?
+  altText String @default("")
+  skill   Skill? @relation("Skill_logo")
 }

@@ -2,8 +2,9 @@ import { useState } from 'react';
 
 interface IInitialFormValues {
 	name: string;
-	price: number;
 	description: string;
+	startDate?: string;
+	endDate?: string;
 }
 
 interface IEventTargetTypes {
@@ -15,8 +16,9 @@ interface IEventTargetTypes {
 export default function useForm() {
 	const initialValues = {
 		name: '',
-		price: 0,
 		description: '',
+		startDate: '',
+		endDate: '',
 	};
 	// create a state object for our inputs
 	const [inputs, setInputs] = useState<IInitialFormValues>(initialValues);
@@ -43,7 +45,9 @@ export default function useForm() {
 		setInputs(initialValues);
 	}
 
-	const clearForm = (e: React.MouseEvent<HTMLButtonElement>) => {
+	const clearForm = (
+		e: React.MouseEvent<HTMLButtonElement> | React.FormEvent<HTMLFormElement>,
+	) => {
 		e.preventDefault();
 		const blankState = Object.fromEntries(
 			Object.entries(inputs).map(([key, _]) => [key, '']),

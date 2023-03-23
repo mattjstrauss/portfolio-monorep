@@ -4,11 +4,14 @@
 //
 // Keystone imports the default export of this file, expecting a Keystone configuration object
 //   you can find out more at https://keystonejs.com/docs/apis/config
-
+import 'dotenv/config';
 import { config } from '@keystone-6/core';
 
 // to keep this file tidy, we define our schema in a different file
-import { Experiences, Users, Skills } from './schemas';
+import { Experiences } from './schemas/Experiences';
+import { Users } from './schemas/Users';
+import { Skills } from './schemas/Skills';
+import { SkillLogos } from './schemas/SkillLogos';
 
 // authentication is configured separately here too, but you might move this elsewhere
 // when you write your list-level access control functions, as they typically rely on session data
@@ -19,6 +22,12 @@ const databaseURL =
 
 export default withAuth(
 	config({
+		server: {
+			cors: {
+				origin: [process.env.FRONTEND_URL || 'http://localhost:3001'],
+				credentials: true,
+			},
+		},
 		db: {
 			provider: 'mysql',
 			url: databaseURL,
@@ -29,7 +38,7 @@ export default withAuth(
 			enableLogging: true,
 			idField: { kind: 'uuid' },
 		},
-		lists: { ...Users, ...Experiences, ...Skills },
+		lists: { ...Users, ...Experiences, ...Skills, ...SkillLogos },
 		session,
 	}),
 );
