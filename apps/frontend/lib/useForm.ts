@@ -2,6 +2,8 @@ import { useState } from 'react';
 
 interface IInitialFormValues {
 	name: string;
+	company?: string;
+	title?: string;
 	description: string;
 	startDate?: string;
 	endDate?: string;
@@ -16,9 +18,11 @@ interface IEventTargetTypes {
 export default function useForm() {
 	const initialValues = {
 		name: '',
+		company: '',
 		description: '',
 		startDate: '',
 		endDate: '',
+		title: '',
 	};
 	// create a state object for our inputs
 	const [inputs, setInputs] = useState<IInitialFormValues>(initialValues);
@@ -34,6 +38,21 @@ export default function useForm() {
 			// @ts-ignore
 			value = (e.target as HTMLInputElement).files[0];
 		}
+
+		if (name === 'description') {
+			// @ts-ignore
+			value = [
+				{
+					children: [
+						{
+							text: value,
+						},
+					],
+					type: 'paragraph',
+				},
+			];
+		}
+
 		setInputs({
 			// copy/spread existing state
 			...inputs,

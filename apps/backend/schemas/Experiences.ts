@@ -1,6 +1,6 @@
 import { list } from '@keystone-6/core';
 import { allowAll } from '@keystone-6/core/access';
-import { relationship, text } from '@keystone-6/core/fields';
+import { relationship, text, calendarDay } from '@keystone-6/core/fields';
 
 // the document field is a more complicated field, so it has it's own package
 import { document } from '@keystone-6/fields-document';
@@ -15,8 +15,7 @@ export const Experiences = {
 
 		// this is the fields for our Post list
 		fields: {
-			companyName: text({ validation: { isRequired: true } }),
-			positionTitle: text({ validation: { isRequired: true } }),
+			title: text({ validation: { isRequired: true } }),
 			// the document field can be used for making rich editable content
 			//   you can find out more at https://keystonejs.com/docs/guides/document-fields
 			description: document({
@@ -32,7 +31,26 @@ export const Experiences = {
 				dividers: true,
 			}),
 
-			// with this field, you can add some Skills to Experiences
+			startDate: calendarDay({
+				db: { map: 'start_date' },
+				// isIndexed: 'unique',
+			}),
+			endDate: calendarDay({
+				db: { map: 'end_date' },
+				// isIndexed: 'unique',
+			}),
+			company: relationship({
+				ref: 'Company.experience',
+				many: false,
+				ui: {
+					displayMode: 'cards',
+					cardFields: ['name', 'image'],
+					inlineConnect: true,
+					inlineCreate: { fields: ['name', 'image', 'altText'] },
+					inlineEdit: { fields: ['name', 'image', 'altText'] },
+				},
+			}),
+			// // with this field, you can add some Skills to Experiences
 			skills: relationship({
 				// we could have used 'Tag', but then the relationship would only be 1-way
 				ref: 'Skill.experiences',
@@ -41,14 +59,14 @@ export const Experiences = {
 				many: true,
 
 				// this is some customisations for changing how this will look in the AdminUI
-				ui: {
-					displayMode: 'cards',
-					cardFields: ['name'],
-					inlineEdit: { fields: ['name'] },
-					linkToItem: true,
-					inlineConnect: true,
-					inlineCreate: { fields: ['name'] },
-				},
+				// ui: {
+				// 	displayMode: 'cards',
+				// 	cardFields: ['name', 'image'],
+				// 	inlineEdit: { fields: ['name', 'image'] },
+				// 	linkToItem: true,
+				// 	inlineConnect: true,
+				// 	inlineCreate: { fields: ['name', 'image'] },
+				// },
 			}),
 		},
 	}),

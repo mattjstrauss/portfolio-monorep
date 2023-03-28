@@ -20,25 +20,30 @@ model User {
 }
 
 model Experience {
-  id            String  @id @default(uuid())
-  companyName   String  @default("")
-  positionTitle String  @default("")
-  description   Json    @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
-  skills        Skill[] @relation("Experience_skills")
+  id          String    @id @default(uuid())
+  title       String    @default("")
+  description Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
+  startDate   DateTime? @map("start_date") @mysql.Date
+  endDate     DateTime? @map("end_date") @mysql.Date
+  company     Company?  @relation("Company_experience")
+  skills      Skill[]   @relation("Experience_skills")
 }
 
 model Skill {
   id          String       @id @default(uuid())
   name        String       @default("")
   description Json         @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
-  logo        SkillLogo?   @relation("Skill_logo", fields: [logoId], references: [id])
-  logoId      String?      @unique @map("logo")
+  image       Json?
+  altText     String       @default("")
   experiences Experience[] @relation("Experience_skills")
 }
 
-model SkillLogo {
-  id      String @id @default(uuid())
-  image   Json?
-  altText String @default("")
-  skill   Skill? @relation("Skill_logo")
+model Company {
+  id           String      @id @default(uuid())
+  name         String      @default("")
+  description  Json        @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
+  image        Json?
+  altText      String      @default("")
+  experience   Experience? @relation("Company_experience", fields: [experienceId], references: [id])
+  experienceId String?     @unique @map("experience")
 }

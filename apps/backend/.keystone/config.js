@@ -40,8 +40,7 @@ var Experiences = {
     access: import_access.allowAll,
     // this is the fields for our Post list
     fields: {
-      companyName: (0, import_fields.text)({ validation: { isRequired: true } }),
-      positionTitle: (0, import_fields.text)({ validation: { isRequired: true } }),
+      title: (0, import_fields.text)({ validation: { isRequired: true } }),
       // the document field can be used for making rich editable content
       //   you can find out more at https://keystonejs.com/docs/guides/document-fields
       description: (0, import_fields_document.document)({
@@ -56,21 +55,40 @@ var Experiences = {
         links: true,
         dividers: true
       }),
-      // with this field, you can add some Skills to Experiences
+      startDate: (0, import_fields.calendarDay)({
+        db: { map: "start_date" }
+        // isIndexed: 'unique',
+      }),
+      endDate: (0, import_fields.calendarDay)({
+        db: { map: "end_date" }
+        // isIndexed: 'unique',
+      }),
+      company: (0, import_fields.relationship)({
+        ref: "Company.experience",
+        many: false,
+        ui: {
+          displayMode: "cards",
+          cardFields: ["name", "image"],
+          inlineConnect: true,
+          inlineCreate: { fields: ["name", "image", "altText"] },
+          inlineEdit: { fields: ["name", "image", "altText"] }
+        }
+      }),
+      // // with this field, you can add some Skills to Experiences
       skills: (0, import_fields.relationship)({
         // we could have used 'Tag', but then the relationship would only be 1-way
         ref: "Skill.experiences",
         // a Post can have many Skills, not just one
-        many: true,
+        many: true
         // this is some customisations for changing how this will look in the AdminUI
-        ui: {
-          displayMode: "cards",
-          cardFields: ["name"],
-          inlineEdit: { fields: ["name"] },
-          linkToItem: true,
-          inlineConnect: true,
-          inlineCreate: { fields: ["name"] }
-        }
+        // ui: {
+        // 	displayMode: 'cards',
+        // 	cardFields: ['name', 'image'],
+        // 	inlineEdit: { fields: ['name', 'image'] },
+        // 	linkToItem: true,
+        // 	inlineConnect: true,
+        // 	inlineCreate: { fields: ['name', 'image'] },
+        // },
       })
     }
   })
@@ -108,10 +126,17 @@ var Users = {
 };
 
 // schemas/Skills.ts
+var import_cloudinary = require("@keystone-6/cloudinary");
 var import_core3 = require("@keystone-6/core");
-var import_access3 = require("@keystone-6/core/access");
 var import_fields3 = require("@keystone-6/core/fields");
 var import_fields_document2 = require("@keystone-6/fields-document");
+var import_access3 = require("@keystone-6/core/access");
+var cloudinary = {
+  cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+  apiKey: process.env.CLOUDINARY_API_KEY,
+  apiSecret: process.env.CLOUDINARY_API_SECRET,
+  folder: "matthewjstrauss"
+};
 var Skills = {
   Skill: (0, import_core3.list)({
     // WARNING
@@ -119,11 +144,6 @@ var Skills = {
     //   if you want to prevent random people on the internet from accessing your data,
     //   you can find out more at https://keystonejs.com/docs/guides/auth-and-access-control
     access: import_access3.allowAll,
-    // setting this to isHidden for the user interface prevents this list being visible in the Admin UI
-    // ui: {
-    // 	isHidden: true,
-    // },
-    // this is the fields for our Tag list
     fields: {
       name: (0, import_fields3.text)({ validation: { isRequired: true } }),
       // the document field can be used for making rich editable content
@@ -140,51 +160,72 @@ var Skills = {
         links: true,
         dividers: true
       }),
-      logo: (0, import_fields3.relationship)({
-        ref: "SkillLogo.skill",
-        ui: {
-          displayMode: "cards",
-          cardFields: ["image", "altText"],
-          inlineCreate: { fields: ["image", "altText"] },
-          inlineEdit: { fields: ["image", "altText"] }
-        }
+      image: (0, import_cloudinary.cloudinaryImage)({
+        // @ts-ignore
+        cloudinary,
+        label: "Source"
       }),
+      altText: (0, import_fields3.text)(),
       // this can be helpful to find out all the Experiences associated with a Skill
-      experiences: (0, import_fields3.relationship)({ ref: "Experience.skills", many: true })
+      experiences: (0, import_fields3.relationship)({
+        ref: "Experience.skills",
+        many: true
+      })
+    },
+    ui: {
+      listView: {
+        initialColumns: ["image", "altText"]
+      }
     }
   })
 };
 
-// schemas/SkillLogos.ts
-var import_cloudinary = require("@keystone-6/cloudinary");
+// schemas/Companies.ts
+var import_cloudinary2 = require("@keystone-6/cloudinary");
 var import_core4 = require("@keystone-6/core");
 var import_fields4 = require("@keystone-6/core/fields");
 var import_access4 = require("@keystone-6/core/access");
-var cloudinary = {
+var import_fields_document3 = require("@keystone-6/fields-document");
+var cloudinary2 = {
   cloudName: process.env.CLOUDINARY_CLOUD_NAME,
   apiKey: process.env.CLOUDINARY_API_KEY,
   apiSecret: process.env.CLOUDINARY_API_SECRET,
   folder: "matthewjstrauss"
 };
-var SkillLogos = {
-  SkillLogo: (0, import_core4.list)({
+var Companies = {
+  Company: (0, import_core4.list)({
     // WARNING
     //   for this starter project, anyone can create, query, update and delete anything
     //   if you want to prevent random people on the internet from accessing your data,
     //   you can find out more at https://keystonejs.com/docs/guides/auth-and-access-control
     access: import_access4.allowAll,
     fields: {
-      image: (0, import_cloudinary.cloudinaryImage)({
+      name: (0, import_fields4.text)({ validation: { isRequired: true } }),
+      // the document field can be used for making rich editable content
+      //   you can find out more at https://keystonejs.com/docs/guides/document-fields
+      description: (0, import_fields_document3.document)({
+        formatting: true,
+        layouts: [
+          [1, 1],
+          [1, 1, 1],
+          [2, 1],
+          [1, 2],
+          [1, 2, 1]
+        ],
+        links: true,
+        dividers: true
+      }),
+      image: (0, import_cloudinary2.cloudinaryImage)({
         // @ts-ignore
-        cloudinary,
+        cloudinary: cloudinary2,
         label: "Source"
       }),
       altText: (0, import_fields4.text)(),
-      skill: (0, import_fields4.relationship)({ ref: "Skill.logo" })
+      experience: (0, import_fields4.relationship)({ ref: "Experience.company" })
     },
     ui: {
       listView: {
-        initialColumns: ["image", "altText", "skill"]
+        initialColumns: ["name", "image", "altText", "experience"]
       }
     }
   })
@@ -242,7 +283,12 @@ var keystone_default = withAuth(
       enableLogging: true,
       idField: { kind: "uuid" }
     },
-    lists: { ...Users, ...Experiences, ...Skills, ...SkillLogos },
+    lists: {
+      ...Users,
+      ...Experiences,
+      ...Skills,
+      ...Companies
+    },
     session
   })
 );

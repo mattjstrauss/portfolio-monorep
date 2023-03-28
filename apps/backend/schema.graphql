@@ -113,9 +113,11 @@ input UserCreateInput {
 
 type Experience {
   id: ID!
-  companyName: String
-  positionTitle: String
+  title: String
   description: Experience_description_Document
+  startDate: CalendarDay
+  endDate: CalendarDay
+  company: Company
   skills(where: SkillWhereInput! = {}, orderBy: [SkillOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: SkillWhereUniqueInput): [Skill!]
   skillsCount(where: SkillWhereInput! = {}): Int
 }
@@ -123,6 +125,8 @@ type Experience {
 type Experience_description_Document {
   document(hydrateRelationships: Boolean! = false): JSON!
 }
+
+scalar CalendarDay @specifiedBy(url: "https://datatracker.ietf.org/doc/html/rfc3339#section-5.6")
 
 input ExperienceWhereUniqueInput {
   id: ID
@@ -133,9 +137,22 @@ input ExperienceWhereInput {
   OR: [ExperienceWhereInput!]
   NOT: [ExperienceWhereInput!]
   id: IDFilter
-  companyName: StringFilter
-  positionTitle: StringFilter
+  title: StringFilter
+  startDate: CalendarDayNullableFilter
+  endDate: CalendarDayNullableFilter
+  company: CompanyWhereInput
   skills: SkillManyRelationFilter
+}
+
+input CalendarDayNullableFilter {
+  equals: CalendarDay
+  in: [CalendarDay!]
+  notIn: [CalendarDay!]
+  lt: CalendarDay
+  lte: CalendarDay
+  gt: CalendarDay
+  gte: CalendarDay
+  not: CalendarDayNullableFilter
 }
 
 input SkillManyRelationFilter {
@@ -146,15 +163,24 @@ input SkillManyRelationFilter {
 
 input ExperienceOrderByInput {
   id: OrderDirection
-  companyName: OrderDirection
-  positionTitle: OrderDirection
+  title: OrderDirection
+  startDate: OrderDirection
+  endDate: OrderDirection
 }
 
 input ExperienceUpdateInput {
-  companyName: String
-  positionTitle: String
+  title: String
   description: JSON
+  startDate: CalendarDay
+  endDate: CalendarDay
+  company: CompanyRelateToOneForUpdateInput
   skills: SkillRelateToManyForUpdateInput
+}
+
+input CompanyRelateToOneForUpdateInput {
+  create: CompanyCreateInput
+  connect: CompanyWhereUniqueInput
+  disconnect: Boolean
 }
 
 input SkillRelateToManyForUpdateInput {
@@ -170,10 +196,17 @@ input ExperienceUpdateArgs {
 }
 
 input ExperienceCreateInput {
-  companyName: String
-  positionTitle: String
+  title: String
   description: JSON
+  startDate: CalendarDay
+  endDate: CalendarDay
+  company: CompanyRelateToOneForCreateInput
   skills: SkillRelateToManyForCreateInput
+}
+
+input CompanyRelateToOneForCreateInput {
+  create: CompanyCreateInput
+  connect: CompanyWhereUniqueInput
 }
 
 input SkillRelateToManyForCreateInput {
@@ -185,87 +218,14 @@ type Skill {
   id: ID!
   name: String
   description: Skill_description_Document
-  logo: SkillLogo
+  image: CloudinaryImage_File
+  altText: String
   experiences(where: ExperienceWhereInput! = {}, orderBy: [ExperienceOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ExperienceWhereUniqueInput): [Experience!]
   experiencesCount(where: ExperienceWhereInput! = {}): Int
 }
 
 type Skill_description_Document {
   document(hydrateRelationships: Boolean! = false): JSON!
-}
-
-input SkillWhereUniqueInput {
-  id: ID
-}
-
-input SkillWhereInput {
-  AND: [SkillWhereInput!]
-  OR: [SkillWhereInput!]
-  NOT: [SkillWhereInput!]
-  id: IDFilter
-  name: StringFilter
-  logo: SkillLogoWhereInput
-  experiences: ExperienceManyRelationFilter
-}
-
-input ExperienceManyRelationFilter {
-  every: ExperienceWhereInput
-  some: ExperienceWhereInput
-  none: ExperienceWhereInput
-}
-
-input SkillOrderByInput {
-  id: OrderDirection
-  name: OrderDirection
-}
-
-input SkillUpdateInput {
-  name: String
-  description: JSON
-  logo: SkillLogoRelateToOneForUpdateInput
-  experiences: ExperienceRelateToManyForUpdateInput
-}
-
-input SkillLogoRelateToOneForUpdateInput {
-  create: SkillLogoCreateInput
-  connect: SkillLogoWhereUniqueInput
-  disconnect: Boolean
-}
-
-input ExperienceRelateToManyForUpdateInput {
-  disconnect: [ExperienceWhereUniqueInput!]
-  set: [ExperienceWhereUniqueInput!]
-  create: [ExperienceCreateInput!]
-  connect: [ExperienceWhereUniqueInput!]
-}
-
-input SkillUpdateArgs {
-  where: SkillWhereUniqueInput!
-  data: SkillUpdateInput!
-}
-
-input SkillCreateInput {
-  name: String
-  description: JSON
-  logo: SkillLogoRelateToOneForCreateInput
-  experiences: ExperienceRelateToManyForCreateInput
-}
-
-input SkillLogoRelateToOneForCreateInput {
-  create: SkillLogoCreateInput
-  connect: SkillLogoWhereUniqueInput
-}
-
-input ExperienceRelateToManyForCreateInput {
-  create: [ExperienceCreateInput!]
-  connect: [ExperienceWhereUniqueInput!]
-}
-
-type SkillLogo {
-  id: ID!
-  image: CloudinaryImage_File
-  altText: String
-  skill: Skill
 }
 
 type CloudinaryImage_File {
@@ -316,53 +276,131 @@ input CloudinaryImageFormat {
   transformation: String
 }
 
-input SkillLogoWhereUniqueInput {
+input SkillWhereUniqueInput {
   id: ID
 }
 
-input SkillLogoWhereInput {
-  AND: [SkillLogoWhereInput!]
-  OR: [SkillLogoWhereInput!]
-  NOT: [SkillLogoWhereInput!]
+input SkillWhereInput {
+  AND: [SkillWhereInput!]
+  OR: [SkillWhereInput!]
+  NOT: [SkillWhereInput!]
   id: IDFilter
+  name: StringFilter
   altText: StringFilter
-  skill: SkillWhereInput
+  experiences: ExperienceManyRelationFilter
 }
 
-input SkillLogoOrderByInput {
+input ExperienceManyRelationFilter {
+  every: ExperienceWhereInput
+  some: ExperienceWhereInput
+  none: ExperienceWhereInput
+}
+
+input SkillOrderByInput {
   id: OrderDirection
+  name: OrderDirection
   altText: OrderDirection
 }
 
-input SkillLogoUpdateInput {
+input SkillUpdateInput {
+  name: String
+  description: JSON
   image: Upload
   altText: String
-  skill: SkillRelateToOneForUpdateInput
+  experiences: ExperienceRelateToManyForUpdateInput
 }
 
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
 
-input SkillRelateToOneForUpdateInput {
-  create: SkillCreateInput
-  connect: SkillWhereUniqueInput
+input ExperienceRelateToManyForUpdateInput {
+  disconnect: [ExperienceWhereUniqueInput!]
+  set: [ExperienceWhereUniqueInput!]
+  create: [ExperienceCreateInput!]
+  connect: [ExperienceWhereUniqueInput!]
+}
+
+input SkillUpdateArgs {
+  where: SkillWhereUniqueInput!
+  data: SkillUpdateInput!
+}
+
+input SkillCreateInput {
+  name: String
+  description: JSON
+  image: Upload
+  altText: String
+  experiences: ExperienceRelateToManyForCreateInput
+}
+
+input ExperienceRelateToManyForCreateInput {
+  create: [ExperienceCreateInput!]
+  connect: [ExperienceWhereUniqueInput!]
+}
+
+type Company {
+  id: ID!
+  name: String
+  description: Company_description_Document
+  image: CloudinaryImage_File
+  altText: String
+  experience: Experience
+}
+
+type Company_description_Document {
+  document(hydrateRelationships: Boolean! = false): JSON!
+}
+
+input CompanyWhereUniqueInput {
+  id: ID
+}
+
+input CompanyWhereInput {
+  AND: [CompanyWhereInput!]
+  OR: [CompanyWhereInput!]
+  NOT: [CompanyWhereInput!]
+  id: IDFilter
+  name: StringFilter
+  altText: StringFilter
+  experience: ExperienceWhereInput
+}
+
+input CompanyOrderByInput {
+  id: OrderDirection
+  name: OrderDirection
+  altText: OrderDirection
+}
+
+input CompanyUpdateInput {
+  name: String
+  description: JSON
+  image: Upload
+  altText: String
+  experience: ExperienceRelateToOneForUpdateInput
+}
+
+input ExperienceRelateToOneForUpdateInput {
+  create: ExperienceCreateInput
+  connect: ExperienceWhereUniqueInput
   disconnect: Boolean
 }
 
-input SkillLogoUpdateArgs {
-  where: SkillLogoWhereUniqueInput!
-  data: SkillLogoUpdateInput!
+input CompanyUpdateArgs {
+  where: CompanyWhereUniqueInput!
+  data: CompanyUpdateInput!
 }
 
-input SkillLogoCreateInput {
+input CompanyCreateInput {
+  name: String
+  description: JSON
   image: Upload
   altText: String
-  skill: SkillRelateToOneForCreateInput
+  experience: ExperienceRelateToOneForCreateInput
 }
 
-input SkillRelateToOneForCreateInput {
-  create: SkillCreateInput
-  connect: SkillWhereUniqueInput
+input ExperienceRelateToOneForCreateInput {
+  create: ExperienceCreateInput
+  connect: ExperienceWhereUniqueInput
 }
 
 """
@@ -389,12 +427,12 @@ type Mutation {
   updateSkills(data: [SkillUpdateArgs!]!): [Skill]
   deleteSkill(where: SkillWhereUniqueInput!): Skill
   deleteSkills(where: [SkillWhereUniqueInput!]!): [Skill]
-  createSkillLogo(data: SkillLogoCreateInput!): SkillLogo
-  createSkillLogos(data: [SkillLogoCreateInput!]!): [SkillLogo]
-  updateSkillLogo(where: SkillLogoWhereUniqueInput!, data: SkillLogoUpdateInput!): SkillLogo
-  updateSkillLogos(data: [SkillLogoUpdateArgs!]!): [SkillLogo]
-  deleteSkillLogo(where: SkillLogoWhereUniqueInput!): SkillLogo
-  deleteSkillLogos(where: [SkillLogoWhereUniqueInput!]!): [SkillLogo]
+  createCompany(data: CompanyCreateInput!): Company
+  createCompanies(data: [CompanyCreateInput!]!): [Company]
+  updateCompany(where: CompanyWhereUniqueInput!, data: CompanyUpdateInput!): Company
+  updateCompanies(data: [CompanyUpdateArgs!]!): [Company]
+  deleteCompany(where: CompanyWhereUniqueInput!): Company
+  deleteCompanies(where: [CompanyWhereUniqueInput!]!): [Company]
   endSession: Boolean!
   authenticateUserWithPassword(email: String!, password: String!): UserAuthenticationWithPasswordResult
   createInitialUser(data: CreateInitialUserInput!): UserAuthenticationWithPasswordSuccess!
@@ -427,9 +465,9 @@ type Query {
   skills(where: SkillWhereInput! = {}, orderBy: [SkillOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: SkillWhereUniqueInput): [Skill!]
   skill(where: SkillWhereUniqueInput!): Skill
   skillsCount(where: SkillWhereInput! = {}): Int
-  skillLogos(where: SkillLogoWhereInput! = {}, orderBy: [SkillLogoOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: SkillLogoWhereUniqueInput): [SkillLogo!]
-  skillLogo(where: SkillLogoWhereUniqueInput!): SkillLogo
-  skillLogosCount(where: SkillLogoWhereInput! = {}): Int
+  companies(where: CompanyWhereInput! = {}, orderBy: [CompanyOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: CompanyWhereUniqueInput): [Company!]
+  company(where: CompanyWhereUniqueInput!): Company
+  companiesCount(where: CompanyWhereInput! = {}): Int
   keystone: KeystoneMeta!
   authenticatedItem: AuthenticatedItem
 }

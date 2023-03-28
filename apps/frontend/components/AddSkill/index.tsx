@@ -3,6 +3,7 @@ import Form from './styles';
 import gql from 'graphql-tag';
 import { document } from '@keystone-6/fields-document';
 import { useMutation } from '@apollo/client';
+import DisplayError from '../ErrorMessage';
 
 const CREATE_SKILL_MUTATION = gql`
 	mutation CREATE_SKILL_MUTATION(
@@ -11,7 +12,15 @@ const CREATE_SKILL_MUTATION = gql`
 		$logo: Upload
 	) {
 		createSkill(
-			data: { name: $name, logo: { create: { image: $logo, altText: $name } } }
+			data: {
+				name: $name
+				logo: {
+					create: {
+						image: $logo # name of the input id
+						altText: $name # name of the input id
+					}
+				}
+			}
 		) {
 			id
 			name
@@ -34,22 +43,18 @@ export default function AddSkill() {
 		},
 	);
 
-	async function submitForm(e: { preventDefault: () => void }) {
-		e.preventDefault();
-		const res = await createSkill();
-		console.log(res);
-	}
 	return (
 		<Form
 			onSubmit={async (e) => {
 				e.preventDefault();
 				console.log(inputs);
-				// Submit the inputfields to the backend:
+				// Submit the input fields to the backend:
 				await createSkill();
 				clearForm(e);
 			}}
 		>
-			<fieldset aria-busy>
+			<DisplayError error={error} />
+			<fieldset disabled={loading} aria-busy={loading}>
 				<label htmlFor="logo">
 					Logo
 					<input

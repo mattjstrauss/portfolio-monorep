@@ -2,6 +2,8 @@ import { cloudinaryImage } from '@keystone-6/cloudinary';
 import { list } from '@keystone-6/core';
 import { relationship, text } from '@keystone-6/core/fields';
 import { allowAll } from '@keystone-6/core/access';
+// the document field is a more complicated field, so it has it's own package
+import { document } from '@keystone-6/fields-document';
 
 export const cloudinary = {
 	cloudName: process.env.CLOUDINARY_CLOUD_NAME,
@@ -9,25 +11,41 @@ export const cloudinary = {
 	apiSecret: process.env.CLOUDINARY_API_SECRET,
 	folder: 'matthewjstrauss',
 };
-export const SkillLogos = {
-	SkillLogo: list({
+export const Companies = {
+	Company: list({
 		// WARNING
 		//   for this starter project, anyone can create, query, update and delete anything
 		//   if you want to prevent random people on the internet from accessing your data,
 		//   you can find out more at https://keystonejs.com/docs/guides/auth-and-access-control
 		access: allowAll,
 		fields: {
+			name: text({ validation: { isRequired: true } }),
+
+			// the document field can be used for making rich editable content
+			//   you can find out more at https://keystonejs.com/docs/guides/document-fields
+			description: document({
+				formatting: true,
+				layouts: [
+					[1, 1],
+					[1, 1, 1],
+					[2, 1],
+					[1, 2],
+					[1, 2, 1],
+				],
+				links: true,
+				dividers: true,
+			}),
 			image: cloudinaryImage({
 				// @ts-ignore
 				cloudinary,
 				label: 'Source',
 			}),
 			altText: text(),
-			skill: relationship({ ref: 'Skill.logo' }),
+			experience: relationship({ ref: 'Experience.company' }),
 		},
 		ui: {
 			listView: {
-				initialColumns: ['image', 'altText', 'skill'],
+				initialColumns: ['name', 'image', 'altText', 'experience'],
 			},
 		},
 	}),
